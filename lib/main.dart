@@ -11,61 +11,6 @@ const String pubTopic = ''; //replace with your own mqtt topic
 
 void main() => runApp(MyApp());
 
-Future<dynamic> onMqttConnect() async {
-  client.logging(on: false);
-
-  client.onDisconnected = onDisconnected;
-
-  client.onConnected = onConnected;
-
-  final MqttConnectMessage connMess = MqttConnectMessage()
-      .withClientIdentifier('') //replace with your own mqtt
-      .startClean()
-      .withWillQos(MqttQos.atLeastOnce);
-  print('CMMC::client connecting....');
-  client.connectionMessage = connMess;
-
-  try {
-    await client.connect();
-  } on Exception catch (e) {
-    print('CMMC::client exception - $e');
-    client.disconnect();
-  }
-
-  if (client.connectionStatus.state == MqttConnectionState.connected) {
-    print('CMMC::client connected');
-  } else {
-    print(
-        'CMMC::ERROR client connection failed - disconnecting, status is ${client.connectionStatus}');
-    client.disconnect();
-    exit(-1);
-  }
-  return 0;
-}
-
-Future<Null> _onPublishMessage(command) async {
-  final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
-  builder.addString(command);
-
-  print('CMMC::Publishing our topic');
-  client.publishMessage(pubTopic, MqttQos.atLeastOnce, builder.payload);
-
-  print('CMMC::Sleeping....');
-  await MqttUtilities.asyncSleep(120);
-}
-
-void onDisconnected() {
-  print('CMMC::OnDisconnected client callback - Client disconnection');
-  if (client.connectionStatus.returnCode == MqttConnectReturnCode.solicited) {
-    print('CMMC::OnDisconnected callback is solicited, this is correct');
-  }
-  exit(-1);
-}
-
-void onConnected() {
-  print('CMMC::OnConnected client callback - Client connection was sucessful');
-}
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -92,20 +37,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _state = "";
 
-  void _turnOn() {
-    setState(() {
-      _onPublishMessage("ON");
-      _state = "ON";
-    });
-  }
-
-  void _turnOff() {
-    setState(() {
-      _onPublishMessage("OFF");
-      _state = "OFF";
-    });
-  }
-
   @override
   void deactivate() {
     super.deactivate();
@@ -124,6 +55,76 @@ class _MyHomePageState extends State<MyHomePage> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+  }
+
+  Future<dynamic> onMqttConnect() async {
+    client.logging(on: false);
+
+    client.onDisconnected = onDisconnected;
+
+    client.onConnected = onConnected;
+
+    final MqttConnectMessage connMess = MqttConnectMessage()
+        .withClientIdentifier('') //replace with your own mqtt
+        .startClean()
+        .withWillQos(MqttQos.atLeastOnce);
+    print('CMMC::client connecting....');
+    client.connectionMessage = connMess;
+
+    try {
+      await client.connect();
+    } on Exception catch (e) {
+      print('CMMC::client exception - $e');
+      client.disconnect();
+    }
+
+    if (client.connectionStatus.state == MqttConnectionState.connected) {
+      print('CMMC::client connected');
+    } else {
+      print(
+          'CMMC::ERROR client connection failed - disconnecting, status is ${client.connectionStatus}');
+      client.disconnect();
+      exit(-1);
+    }
+    return 0;
+  }
+
+  Future<Null> _onPublishMessage(command) async {
+    final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
+    builder.addString(command);
+
+    print('CMMC::Publishing our topic');
+    client.publishMessage(pubTopic, MqttQos.atLeastOnce, builder.payload);
+
+    print('CMMC::Sleeping....');
+    await MqttUtilities.asyncSleep(120);
+  }
+
+  void onDisconnected() {
+    print('CMMC::OnDisconnected client callback - Client disconnection');
+    if (client.connectionStatus.returnCode == MqttConnectReturnCode.solicited) {
+      print('CMMC::OnDisconnected callback is solicited, this is correct');
+    }
+    exit(-1);
+  }
+
+  void onConnected() {
+    print(
+        'CMMC::OnConnected client callback - Client connection was sucessful');
+  }
+
+  void _turnOn() {
+    setState(() {
+      _onPublishMessage("ON");
+      _state = "ON";
+    });
+  }
+
+  void _turnOff() {
+    setState(() {
+      _onPublishMessage("OFF");
+      _state = "OFF";
+    });
   }
 
   @override
