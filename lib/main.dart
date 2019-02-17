@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:flutter/services.dart';
 
-final MqttClient client = MqttClient('', ''); //replace with your own mqtt
+final MqttClient client =
+    MqttClient('mqtt.cmmc.io', ''); //replace with your own mqtt
 
 const String pubTopic = ''; //replace with your own mqtt topic
 
@@ -21,21 +22,21 @@ Future<dynamic> onMqttConnect() async {
       .withClientIdentifier('') //replace with your own mqtt
       .startClean()
       .withWillQos(MqttQos.atLeastOnce);
-  print('EXAMPLE::CMMC client connecting....');
+  print('CMMC::client connecting....');
   client.connectionMessage = connMess;
 
   try {
     await client.connect();
   } on Exception catch (e) {
-    print('EXAMPLE::client exception - $e');
+    print('CMMC::client exception - $e');
     client.disconnect();
   }
 
   if (client.connectionStatus.state == MqttConnectionState.connected) {
-    print('EXAMPLE::CMMC client connected');
+    print('CMMC::client connected');
   } else {
     print(
-        'EXAMPLE::ERROR CMMC client connection failed - disconnecting, status is ${client.connectionStatus}');
+        'CMMC::ERROR client connection failed - disconnecting, status is ${client.connectionStatus}');
     client.disconnect();
     exit(-1);
   }
@@ -46,24 +47,23 @@ Future<Null> _onPublishMessage(command) async {
   final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
   builder.addString(command);
 
-  print('EXAMPLE::Publishing our topic');
+  print('CMMC::Publishing our topic');
   client.publishMessage(pubTopic, MqttQos.atLeastOnce, builder.payload);
 
-  print('EXAMPLE::Sleeping....');
+  print('CMMC::Sleeping....');
   await MqttUtilities.asyncSleep(120);
 }
 
 void onDisconnected() {
-  print('EXAMPLE::OnDisconnected client callback - Client disconnection');
+  print('CMMC::OnDisconnected client callback - Client disconnection');
   if (client.connectionStatus.returnCode == MqttConnectReturnCode.solicited) {
-    print('EXAMPLE::OnDisconnected callback is solicited, this is correct');
+    print('CMMC::OnDisconnected callback is solicited, this is correct');
   }
   exit(-1);
 }
 
 void onConnected() {
-  print(
-      'EXAMPLE::OnConnected client callback - Client connection was sucessful');
+  print('CMMC::OnConnected client callback - Client connection was sucessful');
 }
 
 class MyApp extends StatelessWidget {
@@ -113,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
+    client.disconnect();
     super.dispose();
   }
 
