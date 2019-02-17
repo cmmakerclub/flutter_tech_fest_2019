@@ -11,20 +11,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_grill_hack_mqtt/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('On Off smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that our counter starts at empty.
+    expect(find.text(''), findsOneWidget);
+    expect(find.text('ON'), findsNothing);
+    expect(find.text('OFF'), findsNothing);
 
     // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.tap(find.byIcon(Icons.blur_on));
+    await tester.pump();
+
+    // Verify that state has chnage.
+    expect(find.text(''), findsNothing);
+    expect(find.text('ON'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.blur_off));
     await tester.pump();
 
     // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text(''), findsNothing);
+    expect(find.text('OFF'), findsOneWidget);
   });
 }
