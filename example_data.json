@@ -1,0 +1,27 @@
+{
+  "info": { 
+    "ssid":"ampere",
+    "chip_id":"24:0A:C4:00:4F:84",
+    "flash_size":4194304,
+    "mac":"24:0a:c4:00:4f:84",
+    "id":"24:0A:C4:00:4F:84",
+    "client_id":"24:0A:C4:00:4F:84",
+    "device_id":"24:0A:C4:00:4F:84",
+    "prefix":"TECH_FEST/",
+    "ip":"192.168.12.188",
+    "version":"1.3.3"
+  }, 
+  "d": {
+    "myName":"Grill",
+    "millis":1795607,
+    "relayState":1,
+    "temp2":305.25,
+    "temp3":263.25,
+    "updateInterval":2000,
+    "heap":283440,
+    "rssi":-51,
+    "counter":898,
+    "subscription":1,
+    "temp4":154.5
+  }
+}
